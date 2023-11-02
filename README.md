@@ -26,3 +26,6 @@ ser salvas em um arquivo de texto chamado delivery.data ou em banco de dados.
 Toda vez que o programa for aberto, deve carregar os dados a partir da leitura deste
 arquivo ou banco de dados;
 - Na estrutura de software do projeto deve constar no mínimo uma classe abstrata; 
+
+❇️ O Projeto está em andamento
+❇️ Trabalho em equipe
