@@ -1,1 +1,45 @@
 
+import time
+
+#Definição de ClassDousuário principal 
+class Usuário:
+  def __init__(self, nome_completo, dataDeNasc, cpf, endereço, telefone, email, senha):
+      self.nome_completo = nome_completo
+      self.dataDeNasc = int(dataDeNasc)
+      self.cpf = cpf
+      self.endereço = endereço
+      self.telefone = telefone
+      self.email = email
+      self.senha = senha
+
+  
+#salvar os dados temporariamente até o banco de dados estar estruturado
+  def salvar_dados(self):
+      with open("usuario.txt", "w") as arquivo:
+          arquivo.write("nome completo: {}\n".format(self.nome_completo))
+          arquivo.write("DataDeNasc: {}\n".format(self.dataDeNasc))
+          arquivo.write("cpf: {}\n".format(self.cpf))
+          arquivo.write("endereço: {}\n".format(self.endereço))
+          arquivo.write("telefone: {}\n".format(self.telefone))
+          arquivo.write("e-mail: {}\n".format(self.email))
+          arquivo.write("senha: {}\n".format(self.senha))
+
+
+#Processo de login do usuário:
+print('BEM VINDO AO GO! FOOD APP')
+time.sleep(2)
+Acesso1 = print(input('sua primeira vez aqui? Digite S já tem cadastro? Digite N   '))
+if Acesso1 != 'N':
+  print('Vamos criar sua conta!')
+  usuario1 = Usuário(input('Digite seu nome completo: '),
+    input('Digite sua data de nascimento: '),
+    input('Digite seu CPF: '),
+    input('Digite seu endereço: '),
+    input('Digite seu telefone: '),
+    input('Digite seu melhor email: '),
+    input('Crie sua senha: '))
+
+  usuario1.salvar_dados()
+  print('Cadastro concluído!')
+
+#Acesso ao cadastro iniciado
