@@ -1,0 +1,135 @@
+# Importando bibliotecas e classe database para o funcionamento ========================
+
+import re
+from Model.Database import Database
+from datetime import datetime
+
+# Definindo classe ClienteFinal e seu construtor =======================================
+
+class ClienteFinal:
+    def __init__(self, cpf, nome, telefone, email, dataNascimento, endereco, senha):
+        self.cpf = str(cpf)
+        self.nome = str(nome)
+        self.telefone = str(telefone)
+        self.email = str(email)
+        self.dataNascimento = str(dataNascimento)
+        self.endereco = str(endereco)
+        self.senha = str(senha)
+
+# Função para realizar o cadastro do usuário no sistema ================================
+  
+    def cadastrar_usuario(self, conexao):
+          cursor = None
+          try:
+              cursor = conexao.get_cursor()
+              cursor.execute(
+                  "INSERT INTO clienteFinal (cpf, nome, telefone, email, dataNascimento, endereco, senha) VALUES (%s, %s, %s, %s, %s, %s, %s);",
+                  (self.cpf, self.nome, self.telefone, self.email, self.dataNascimento, self.endereco, self.senha)
+              )
+              conexao.get_conexao().commit()
+              print('Cadastro de usuário concluído!')
+          except Exception as e:
+              print(f"Erro durante o cadastro do usuário: {e}")
+
+# Função para realizar o login do usuário no sistema ===================================
+  
+    def fazer_login(self, conexao, email, senha):
+      while True:
+          cursor = conexao.get_cursor()
+          try:
+              cursor.execute("SELECT email FROM clienteFinal WHERE email = %s AND senha = %s", (email, senha))
+              resultado = cursor.fetchone()
+              if resultado:
+                  print()
+                  print('Login bem-sucedido!')
+                  break
+              else:
+                  print()
+                  print('Credenciais inválidas. Tente novamente.')
+                  email = input('\nDigite seu e-mail: ')
+                  senha = input('Digite sua senha: ')
+          except Exception as e:
+              print(f"Erro durante o login: {e}")
+
+# Função para verificação do usuário no menu (identificar se é cliente) ================
+  
+    def verificar_tipo_usuario(self):
+      return 'cliente'
+
+# Função para validar o input do CPF ===================================================
+  
+    @staticmethod
+    def validar_cpf(cpf):
+      if len(cpf) != 11 or not cpf.isdigit():
+          return False
+      return True
+
+# Função para validar o input do nome ==================================================
+  
+    @staticmethod
+    def validar_nome(nome):
+        while True:
+            if nome.replace(' ', '').isalpha() and isinstance(nome, str) and len(nome) <= 50:
+                nome_formatado = ' '.join(word.capitalize() for word in nome.split())
+                return nome_formatado
+            else:
+                print('\nNome inválido! Por favor, digite um nome válido.')
+                nome = input('\nDigite seu nome completo: ')
+
+# Função para validar o input do telefone ==============================================
+
+    @staticmethod
+    def validar_telefone(telefone):
+        while True:
+            if telefone.isdigit() and 11 <= len(telefone) <= 15:
+                return telefone
+            else:
+                print('\nTelefone inválido! Por favor, digite apenas números.')
+                telefone = input('\nDigite seu telefone: ')
+
+# Função para validar o input do e-mail ================================================
+
+    @staticmethod
+    def validar_email(email):
+        dominios_validos = ['gmail.com', 'outlook.com', 'uol.com.br', 'yahoo.com', 'hotmail.com']
+    
+        while True:
+            if len(email) <= 50 and '@' in email and '.' in email.split('@')[-1]:
+                dominio = email.split('@')[-1]
+                if dominio in dominios_validos:
+                    return email
+            print('\nE-mail inválido! Por favor, digite um e-mail válido.')
+            email = input('\nDigite seu e-mail: ')
+
+# Função para validar data de nascimento ==============================================
+
+    @staticmethod
+    def validar_data_nascimento(data_nascimento):
+        while True:
+            try:
+                data = datetime.strptime(data_nascimento, '%Y%m%d')
+                if data.year >= 1900 and 1 <= data.month <= 12 and 1 <= data.day <= 31:
+                    return data.strftime('%Y-%m-%d')
+                else:
+                    print("\nData de nascimento inválida! Formato aceito: ano-mês-dia")
+                    data_nascimento = input('\nDigite sua data de nascimento: ')
+            except ValueError:
+                print("\nData de nascimento inválida! Formato aceito: ano-mês-dia")
+                data_nascimento = input('\nDigite sua data de nascimento: ')
+
+# Função para validar endereço ==========================================================
+
+    @staticmethod
+    def validar_endereco(endereco):
+        # Padrão para validar o formato do endereço: "Rua X, n° x - Bairro Y"
+        padrao_endereco = r'^Rua [a-zA-Z0-9\s]+,\sn°\s[a-zA-Z0-9\s]+-\sBairro [a-zA-Z0-9\s]+$'
+    
+        if len(endereco) > 80 or not re.match(padrao_endereco, endereco):
+            print('\nEndereço inválido! O formato deve ser: Rua X, n° x - Bairro Y')
+            return None
+    
+        # Se o endereço corresponder ao padrão, retorna o endereço válido
+        return endereco
+
+
+
