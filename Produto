@@ -1,0 +1,29 @@
+# Importação da classe database ========================================================
+
+from Model.Database import Database
+
+# Definição da classe Produto e seu construtor =========================================
+
+class Produto:
+  def __init__(self, descricao, valorVenda, quantidadeDisponivel, unidadeMedida, fk_estabelecimento_cnpj	):
+      self.descricao = descricao
+      self.valorVenda = valorVenda
+      self.quantidadeDisponivel = quantidadeDisponivel
+      self.unidadeMedida = unidadeMedida
+      self.fk_estabelecimento_cnpj = fk_estabelecimento_cnpj
+
+# Definição da função para cadastro do produto no sistema ==============================
+
+  def cadastrar_produto(self, conexao):
+    cursor = None
+    try:
+        cursor = conexao.get_cursor()
+        cursor.execute(
+            "INSERT INTO produto (descricao, valorVenda, quantidadeDisponivel, unidadeMedida, fk_estabelecimento_cnpj) VALUES (%s, %s, %s, %s, %s);",
+            (self.descricao, self.valorVenda, self.quantidadeDisponivel, self.unidadeMedida, self.fk_estabelecimento_cnpj)
+        )
+        conexao.get_conexao().commit()
+        print('Cadastro do produto concluído!')
+    except Exception as e:
+        print(f"Erro durante o cadastro do produto: {e}")
+      
