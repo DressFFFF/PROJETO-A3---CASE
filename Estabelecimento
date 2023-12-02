@@ -1,0 +1,61 @@
+# Importação da biblioteca time e do banco de dados ====================================
+
+import time
+from Model.Database import Database
+
+# Definição da classe Estabelecimento e seu construtor =================================
+
+class Estabelecimento:
+    def __init__(self, cnpj, razaoSocial, email, telefone, segmento, endereco, horarioAbertura, horarioFechamento, senha):
+        self.cnpj = str(cnpj)
+        self.razaoSocial = str(razaoSocial)
+        self.email = str(email)
+        self.telefone = str(telefone)
+        self.segmento = str(segmento)
+        self.endereco = str(endereco)
+        self.horarioAbertura = str(horarioAbertura)
+        self.horarioFechamento = str(horarioFechamento)
+        self.senha = str(senha)
+
+# Função para cadastro do estabelecimento no banco =====================================
+
+    def cadastrar_estabelecimento(self, conexao):
+        cursor = None
+        try:
+            cursor = conexao.get_cursor()
+            cursor.execute(
+              "INSERT INTO estabelecimento (cnpj, razaoSocial, email, telefone, segmento, endereco, horarioAbertura, horarioFechamento, senha) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);",
+          (self.cnpj, self.razaoSocial, self.email, self.telefone, self.segmento, self.endereco, self.horarioAbertura, self.horarioFechamento, self.senha)
+            )
+            conexao.get_conexao().commit()
+            print('Cadastro do estabelecimento concluído!')
+        except Exception as e:
+            print(f"Erro durante o cadastro do estabelecimento: {e}")
+
+# Função para validar e realizar o login ===============================================
+  
+    def fazer_login(self, conexao, email, senha):
+      while True:
+          cursor = conexao.get_cursor()
+          try:
+              cursor.execute("SELECT email FROM estabelecimento WHERE email = %s AND senha = %s", (email, senha))
+              resultado = cursor.fetchone()
+              if resultado:
+                  print()
+                  print('Login bem-sucedido!')
+                  break
+              else:
+                  print()
+                  print('Credenciais inválidas. Tente novamente.')
+                  email = input('\nDigite seu e-mail: ')
+                  senha = input('Digite sua senha: ')
+          except Exception as e:
+              print(f"Erro durante o login: {e}")
+
+# Função de verificação para o menu de login (identificar se é estabelecimento) ========
+  
+    def verificar_tipo_estabelecimento(self):
+      return 'restaurante'
+
+# Função para buscar estabelecimentos disponíveis ======================================
+
