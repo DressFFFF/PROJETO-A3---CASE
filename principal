@@ -1,3 +1,245 @@
+# Importação de todas as classes e bibliotecas necessárias para o funcionamento ========
+
+import time
+from Model.ClienteFinal import ClienteFinal
+from Model.Estabelecimento import Estabelecimento
+from Model.Produto import Produto
+from Model.Database import Database
+
+conexao = Database()
+
+# Início do programa ===================================================================
+
+if __name__ == "__main__":
+    print('Bem-vindo ao Go! Food\n')
+    time.sleep(2)
+
+    while True:
+        tipo_cadastro = input('''
+O que deseja fazer?
+
+[C] - Cadastro de usuário ou restaurante
+[L] - Realizar o login
+[S] - Para sair\n\n''').upper()
+
+# Condição para encerrar o programa ====================================================
+
+        if tipo_cadastro.upper() == 'S':
+            conexao.fechar_conexao()
+            break
+
+# Condição para realizar o cadastro de usuário ou restaurante ==========================
+
+        elif tipo_cadastro.upper() == 'C':
+            tipo_cadastro = input('''
+Menu de Cadastro
+
+Escolha uma das opções:
+
+[U] - Cadastro de usuário
+[R] - Cadastro de um restaurante e produto
+[B] - Voltar\n\n''').upper()
+
+# Condição para realizar o cadastro de usuário =========================================
+
+            if tipo_cadastro.upper() == 'U':                                  
+                print('\nVamos criar sua conta!\n')
+
+# Usuário realizar input do cpf para iniciar o cadastro ================================
+              
+                cpf = input('Digite seu CPF: ')
+
+# Lógica que chama a função para validar o cpf ========================================
+
+                while not ClienteFinal.validar_cpf(cpf):
+                  print('\nCPF inválido! Por favor, digite um CPF válido.')
+                  cpf = input('\nDigite seu CPF: ')
+
+                while not ClienteFinal.validar_cpf(cpf):
+                    print('\nCPF inválido! Por favor, digite um CPF válido.')
+                    cpf = input('\nDigite seu CPF: ')
+
+# Usuário realiza input do nome para continuar o cadastro ==============================
+
+                nome = input('Digite seu nome completo: ')
+                nome_validado = ClienteFinal.validar_nome(nome)
+
+# Lógica que chama a função para validar o nome do usuário =============================
+
+                while nome_validado is None:
+                    print('\nNome inválido! Por favor, digite um nome válido.')
+                    nome = input('\nDigite seu nome completo: ')
+                    nome_validado = ClienteFinal.validar_nome(nome)
+
+# Usuário realiza input do telefone para continuar o cadastro ==========================
+              
+                telefone = input('Digite seu telefone: ')
+
+# Lógica que chama a função para validar o telefone do usuário =========================
+              
+                telefone_validado = ClienteFinal.validar_telefone(telefone)
+                while telefone_validado is None:
+                    print('\nTelefone inválido! Por favor, digite um telefone válido.')
+                    telefone = input('\nDigite seu telefone: ')
+                    telefone_validado = ClienteFinal.validar_telefone(telefone)
+
+# Usuário realiza input do email para continuar o cadastro =============================
+
+                email = input('Digite seu melhor e-mail: ')
+
+# Lógica que chama a função para validar o e-mail do usuário ===========================
+              
+                email_validado = ClienteFinal.validar_email(email)
+                while email_validado is None:
+                    print('\nE-mail inválido! Por favor, digite um e-mail válido.')
+                    email = input('\nDigite seu melhor e-mail: ')
+                    email_validado = ClienteFinal.validar_email(email)
+
+# Usuário realiza o input da data de nascimento para continuar o cadastro ==============
+    
+                dataNascimento = input('Digite sua data de nascimento: ')
+
+# Lógica que chama a função para validar a data de nascimento do usuário ===============
+
+                data_nascimento_validada = ClienteFinal.validar_data_nascimento(dataNascimento)
+                while data_nascimento_validada is None:
+                    print('\nData de nascimento inválida. Formato aceito: ano-mês-dia')
+                    dataNascimento = input('\nDigite sua data de nascimento (ano-mês-dia): ')
+                    data_nascimento_validada = ClienteFinal.validar_data_nascimento(dataNascimento)
+
+# Usuário realiza o input do endereço para continuar o cadastro ========================
+              
+                endereco = input('Digite seu endereço: ')
+
+# Lógica que chama a função para validar o endereço do usuário =========================
+            
+                endereco_validado = ClienteFinal.validar_endereco(endereco)
+                while endereco_validado is None:
+                    endereco = input('\nDigite seu endereço: ')
+                    endereco_validado = ClienteFinal.validar_endereco(endereco)
+                
+                senha = input('Crie sua senha: ')
+                
+                pass
+              
+                usuario = ClienteFinal(cpf, nome, telefone, email, dataNascimento, endereco, senha)
+                usuario.cadastrar_usuario(conexao)
+
+# Condição para realizar o cadastro de um restaurante e produto =======================
+
+            elif tipo_cadastro.upper() == 'R':
+                print('\nVamos criar sua conta!\n')
+                cnpj = input('Digite seu CNPJ: ')
+                razaoSocial = input('Digite o nome do restaurante (Razão Social): ')
+                email = input('Digite o seu melhor e-mail: ')
+                telefone = input('Digite seu telefone: ')
+                segmento = input('Digite o segmento do seu estabelecimento (Alimentício, Bebidas): ')
+                endereco = input('Digite seu endereço: ')
+                horarioAbertura = input('Digite o horário de abertura do estabelecimento: ')
+                horarioFechamento = input('Digite o horário de fechamento do estabelecimento: ')
+                senha = input('Crie sua senha: ')
+
+                restaurante = Estabelecimento(cnpj, razaoSocial, email, telefone, segmento, endereco, horarioAbertura, horarioFechamento, senha)
+                restaurante.cadastrar_estabelecimento(conexao)
+
+# Continuação da condição R, seguindo para o cadastro do produto =======================
+
+                time.sleep(1)
+                while True:
+                  print('''\nAgora vamos cadastrar o produto do estabelecimento!\n''')
+                  descricao = input('Digite o nome do produto: ')
+                  valorVenda = input('Digite o valor de venda: ')
+                  quantidadeDisponivel = input('Digite a quantidade disponível no estoque: ')
+                  unidadeMedida = input('Digite a unidade (un, ml): ')
+                  fk_estabelecimento_cnpj = cnpj
+
+                  pratos = Produto(descricao, valorVenda, quantidadeDisponivel, unidadeMedida, fk_estabelecimento_cnpj)
+                  pratos.cadastrar_produto(conexao)
+
+                  adicionar_outro = input('''
+Deseja adicionar mais um?
+
+[S] - Sim
+[N] - Não\n\n''').upper()
+                  if adicionar_outro.upper() != 'S':
+                    break
+
+# Lógica para seguir para o login do usuário ou do estabelecimento =====================
+      
+        elif tipo_cadastro.upper() == 'L':
+            tipo_login = input('''
+Para realizar o login,
+
+Escolha uma das opções:
+
+[U] - Usuário
+[R] - Restaurante
+[B] - Voltar\n\n''').upper()
+
+# Lógica para que o usuário realize o login no sistema =================================
+          
+            if tipo_login == 'U':
+                usuario = input('\nDigite seu e-mail: ')
+                senha = input('Digite sua senha: ')
+
+                cliente = ClienteFinal("", "", "", "", "", "", "")
+                cliente.fazer_login(conexao, usuario, senha)
+              
+                tipo_usuario = cliente.verificar_tipo_usuario()
+
+                if tipo_usuario == 'cliente':
+                  visualizar_menu = input('''
+Seja bem-vindo cliente!           
+
+Escolha uma da opções:
+
+[P] - Realizar um pedido
+[V] - Visualizar pedidos
+[S] - Sair do App
+\n''').upper()
+
+                  if visualizar_menu == 'P':
+                    print('\nEstabelecimentos disponíveis:\n')
+                    cnpj = conexao.visualizar_restaurantes()
+                    if cnpj:
+                        conexao.listar_produtos(cnpj)
+                    else:
+                        print("Nenhum restaurante selecionado.")
+
+                    adicionar_outro_produto = input('''
+Deseja adicionar mais um?
+          
+[S] - Sim
+[N] - Não\n\n''').upper()
+
+
+
+
+                  
+# Lógica para que o estabelecimento realize o login no sistema =========================
+
+            if tipo_login == 'R':
+              estabelecimento = input('\nDigite seu e-mail: ')
+              senha = input('Digite sua senha: ')
+
+              restaurante = Estabelecimento("", "", "", "", "", "", "", "", "")
+              restaurante.fazer_login(conexao, estabelecimento, senha)
+
+              tipo_estabelecimento = restaurante.verificar_tipo_estabelecimento()
+              
+              if tipo_estabelecimento == 'restaurante':
+                visualizar_menu = input('''
+Seja bem-vindo restaurante!
+
+Escolha uma das opções:
+
+[A] - Visualizar pedidos em andamento 
+[E] - Visualizar pedidos entregues
+[F] - Visualizar pedidos atrasados/dentro do prazo
+\n\n''')
+#----------------------------------------------------------------------------------------------
+
+
 
 import time
 
