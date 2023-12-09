@@ -1,10 +1,13 @@
 # Importação de todas as classes e bibliotecas necessárias para o funcionamento ========
-
+from datetime import datetime, date
 import time
 from Model.ClienteFinal import ClienteFinal
 from Model.Estabelecimento import Estabelecimento
+from Model.Pedido import Pedido
 from Model.Produto import Produto
 from Model.Database import Database
+
+
 
 conexao = Database()
 
@@ -199,24 +202,81 @@ Escolha uma da opções:
 \n''').upper()
 
                   if visualizar_menu == 'P':
-                    print('\nEstabelecimentos disponíveis:\n')
-                    cnpj = conexao.visualizar_restaurantes()
-                    if cnpj:
-                        conexao.listar_produtos(cnpj)
-                    else:
-                        print("Nenhum restaurante selecionado.")
 
-                    adicionar_outro_produto = input('''
-Deseja adicionar mais um?
-          
-[S] - Sim
-[N] - Não\n\n''').upper()
+                  # Busca e exibe os estabelecimentos disponíveis para seleção
+                    estabelecimentos, nomes_estabelecimentos = conexao.buscar_estabelecimentos()
 
+                  # Solicita ao usuário que digite o nome do estabelecimento desejado
+                    nome_estabelecimento = input("\nDigite o estabelecimento desejado: ")
 
+                  # Encontra o CNPJ do estabelecimento selecionado
+                    cnpj_estabelecimento_escolhido = None
+                    for idx, nome in enumerate(nomes_estabelecimentos):
+                        if nome == nome_estabelecimento:
+                            cnpj_estabelecimento_escolhido = estabelecimentos[idx][0]
 
+                  # Busca os produtos disponíveis no estabelecimento selecionado
+                    produtos_estabelecimento = conexao.buscar_produtos_por_cnpj(cnpj_estabelecimento_escolhido)
+                    print("\nProdutos Disponíveis:\n")
+                    for produto in produtos_estabelecimento:
+                        print(f"{produto[0]} - Valor: {produto[1]}")
 
+                    valorTotal = 0.0
+                    produtos_pedido = []
+
+                  # Solicita ao usuário que selecione produtos para adicionar ao pedido
+                    while True:
+                        nome_produto = input("\nDigite o produto que deseja ou 'S' para sair: ")
+                        if nome_produto.upper() == 'S':
+                            break
+
+                  # Verifica se o produto selecionado está disponível no estabelecimento
+                        for produto in produtos_estabelecimento:
+                            if nome_produto == produto[0]:
+                                produtos_pedido.append(produto)
+                                valorTotal += float(produto[1])
+
+                        adicionar_outro = input('''
+                  \nDeseja adicionar mais um produto?
+
+                  [S] - Sim
+                  [N] - Não
+                  \n''').upper()
+                        if adicionar_outro != 'S':
+                            break
+
+                  # Exibe o valor total do pedido para confirmação
+                    print("\nValor Total do Pedido:", valorTotal)
+                    confirmacao_pedido = input('''
+                  \nDeseja confirmar o pedido?
+
+                  [S] - Sim
+                  [N] - Não
+                  \n''').upper()
+
+                  # Se a confirmação for 'S', cria o pedido e insere no banco de dados
+                    if confirmacao_pedido == 'S':
+
+                  # Coleta os nomes dos produtos escolhidos para o pedido
+                      nomes_produtos = [produto[0] for produto in produtos_pedido]
+
+                      valorTotal = float(valorTotal)
+
+                  # Agrupa os nomes dos produtos em uma única string separada por vírgulas
+                      produtos_juntos = ', '.join(nomes_produtos)
+
+                  # Cria o pedido com os produtos e o valor total e insere no banco
+                      pedido_finalizado = Pedido(nome_estabelecimento, produtos_juntos, valorTotal)
+                      pedido_finalizado.inserir_pedido(conexao)
+                    
+                  # Status do pedido em andamento....  
+                      print('\n Aguarde a confirmação do pedido.')
+                      time.sleep(10)
+                      print('\n Está em Andamento')
+                      time.sleep(20)
+                      print('\n Saiu para entrega')
                   
-# Lógica para que o estabelecimento realize o login no sistema =========================
+# Lógica para que o estabelecimento reaCize o login no sistema =========================
 
             if tipo_login == 'R':
               estabelecimento = input('\nDigite seu e-mail: ')
@@ -228,60 +288,54 @@ Deseja adicionar mais um?
               tipo_estabelecimento = restaurante.verificar_tipo_estabelecimento()
               
               if tipo_estabelecimento == 'restaurante':
-                visualizar_menu = input('''
+                visualizar_menu1 = input('''
 Seja bem-vindo restaurante!
 
 Escolha uma das opções:
 
-[A] - Visualizar pedidos em andamento 
-[E] - Visualizar pedidos entregues
-[F] - Visualizar pedidos atrasados/dentro do prazo
-\n\n''')
-#----------------------------------------------------------------------------------------------
+[T] - Visualizar pedidos em andamento 
+[A] - Visualizar pedidos entregues
+''').upper()
 
 
-
-import time
-
-#Definição de ClassDousuário principal 
-class Usuário:
-  def __init__(self, nome_completo, dataDeNasc, cpf, endereço, telefone, email, senha):
-      self.nome_completo = nome_completo
-      self.dataDeNasc = int(dataDeNasc)
-      self.cpf = cpf
-      self.endereço = endereço
-      self.telefone = telefone
-      self.email = email
-      self.senha = senha
-
-  
-#salvar os dados temporariamente até o banco de dados estar estruturado
-  def salvar_dados(self):
-      with open("usuario.txt", "w") as arquivo:
-          arquivo.write("nome completo: {}\n".format(self.nome_completo))
-          arquivo.write("DataDeNasc: {}\n".format(self.dataDeNasc))
-          arquivo.write("cpf: {}\n".format(self.cpf))
-          arquivo.write("endereço: {}\n".format(self.endereço))
-          arquivo.write("telefone: {}\n".format(self.telefone))
-          arquivo.write("e-mail: {}\n".format(self.email))
-          arquivo.write("senha: {}\n".format(self.senha))
+                if visualizar_menu1 == 'T':
+                
+                  estabelecimento = restaurante.nome_estabelecimento_autenticado
+                  pedidos_em_andamento = Pedido.buscar_pedidos_por_estabelecimento(conexao, estabelecimento)
+                
+                  if pedidos_em_andamento:
+                      print("\nPedidos:")
+                      for pedido_str, valor_total in pedidos_em_andamento:
+                          print(f"\nPedido: {pedido_str} - Valor Total: {valor_total}")
+                  else:
+                      print("\nNão há pedidos para este estabelecimento.")
+                elif visualizar_menu1 == 'S':
+                  break
+                else:
+                   print("\nOpção inválida. Por favor, escolha uma opção válida.")
 
 
-#Processo de login do usuário:
-print('BEM VINDO AO GO! FOOD APP')
-time.sleep(2)
-Acesso1 = print(input('sua primeira vez aqui? Digite S já tem cadastro? Digite N   '))
-if Acesso1 != 'N':
-  print('Vamos criar sua conta!')
-  usuario1 = Usuário(input('Digite seu nome completo: '),
-    input('Digite sua data de nascimento: '),
-    input('Digite seu CPF: '),
-    input('Digite seu endereço: '),
-    input('Digite seu telefone: '),
-    input('Digite seu melhor email: '),
-    input('Crie sua senha: '))
+                if visualizar_menu1 == 'A':
+                  pedidos_em_andamento = Pedido.buscar_pedidos_por_estabelecimento(conexao, estabelecimento)
 
-  usuario1.salvar_dados()
-  print('Cadastro concluído!')
+                  if pedidos_em_andamento:
+                      print("\nPedidos em andamento:")
+                      for pedido_str, valor_total in pedidos_em_andamento:
+                          try:
+                              cursor = conexao.get_cursor()
+                              cursor.execute("SELECT dataHorario FROM pedido WHERE estabelecimento = %s AND produto = %s AND valorTotal = %s;", (estabelecimento, pedido_str, valor_total))
+                              resultado = cursor.fetchone()
+                              hora_pedido = resultado[0] if resultado else datetime.now()
 
-#Acesso ao cadastro iniciado
+                              status_pedido = Pedido.calcular_status_pedido(tempo_limite_entrega=30, hora_pedido=hora_pedido)
+
+                              print(f"\nPedido: {pedido_str} - Valor Total: {valor_total} - Status: {status_pedido}")
+                          except Exception as e:
+                              print(f"Erro ao buscar hora do pedido: {e}")
+                  else:
+                      print("\nNão há pedidos em andamento para este estabelecimento.")
+            # elif visualizar_menu == 'S':
+            #     break
+            # else:
+            #     print("\nOpção inválida. Por favor, escolha uma opção válida.")
+        
