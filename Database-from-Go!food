@@ -1,0 +1,67 @@
+# Importando o mysql connector para conectar com o banco de dados ======================
+
+import mysql.connector
+
+class Database:
+    def __init__(self):
+        self.conexao = mysql.connector.connect(
+            host="db4free.net",
+            user="jpsilvafr",
+            password=" ",
+            database="gofood"
+        )
+        self.cursor = self.conexao.cursor()
+      
+
+# Definindo função para retornar conexão com banco de dados ============================
+  
+    def get_conexao(self):
+        return self.conexao
+
+# Definindo função para executar comandos no banco de dados ============================
+  
+    def get_cursor(self):
+        return self.cursor
+
+# Definindo função para fechar conexão com banco de dados ==============================
+
+    def fechar_conexao(self):
+      if self.conexao.is_connected():
+          self.cursor.close()
+          self.conexao.close()
+
+# Definindo função para visualizar os restaurantes disponíveis =========================
+
+    def buscar_estabelecimentos(self):
+      self.get_cursor().execute("SELECT cnpj, razaoSocial FROM estabelecimento")
+      estabelecimentos = self.get_cursor().fetchall()
+  
+      print("Estabelecimentos Disponíveis:")
+      nomes_estabelecimentos = []  # Lista para armazenar apenas os nomes
+      for estabelecimento in estabelecimentos:
+          nome_estabelecimento = estabelecimento[1]
+          cnpj_estabelecimento = estabelecimento[0]
+          nomes_estabelecimentos.append(nome_estabelecimento)
+          print(f"{nome_estabelecimento} - CNPJ: {cnpj_estabelecimento}")
+  
+      return estabelecimentos, nomes_estabelecimentos
+    
+# Função para lista os produtos ========================================================
+
+    def buscar_produtos_por_cnpj(self, cnpj):
+      try:
+          cursor = self.get_cursor()
+          cursor.execute("SELECT descricao, valorVenda FROM produto WHERE fk_estabelecimento_cnpj = %s", (cnpj,))
+          produtos = cursor.fetchall()
+  
+          if produtos:
+              return produtos
+          else:
+              return []
+  
+      except Exception as e:
+          print(f"\nErro ao listar os produtos: {e}")
+          return []
+
+
+
