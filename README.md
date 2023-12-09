@@ -33,5 +33,6 @@ arquivo ou banco de dados;
 ----- Relatório ---------
 
 O projeto foi feito com uma proposta objetiva de conseguir realizar pedidos e fazer cadastros precisos na plataforma. 
+
 Pontos positivos: Todo o projeto foi validado para a resposta ser direcionada e limitada ao usuário, com letras pontuais que foram utilizadas como variáveis para direcionar para a ação necessária do cliente.
 O Restaurante poderá adicionar os pratos disponíveis assim que for cadastrado no sistema, podendendo retornar o login.
