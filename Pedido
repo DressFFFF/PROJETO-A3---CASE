@@ -1,0 +1,58 @@
+# Importando bibliotecas e classe database para o funcionamento ========================
+
+import re
+from Model.Database import Database
+from datetime import datetime, date
+
+
+
+# Definindo classe ClienteFinal e seu construtor =======================================
+
+class Pedido:
+    def __init__(self, estabelecimento, produto, valorTotal):
+        self.estabelecimento = str(estabelecimento)
+        self.produto = str(produto)
+        self.valorTotal = float(valorTotal)
+
+# Definindo função para salvar o pedido no banco de dados ==============================
+
+    def inserir_pedido(self, conexao):
+      cursor = None
+      try:
+          cursor = conexao.get_cursor()
+          cursor.execute(
+              "INSERT INTO pedido (estabelecimento, produto, valorTotal) VALUES (%s, %s, %s);",
+              (self.estabelecimento, self.produto, self.valorTotal)
+          )
+          conexao.get_conexao().commit()
+          print('Pedido adicionado com sucesso!')
+      except Exception as e:
+          print(f"Erro ao concluir o pedido: {e}")
+
+
+    @staticmethod
+    def buscar_pedidos_por_estabelecimento(conexao, nome_estabelecimento):
+        cursor = conexao.get_cursor()
+        try:
+            cursor.execute("SELECT produto, valorTotal FROM pedido WHERE estabelecimento = %s;", (nome_estabelecimento,))
+            pedidos = cursor.fetchall()
+            return pedidos
+        except Exception as e:
+            print(f"Erro ao buscar pedidos por estabelecimento: {e}")
+            return None
+    
+    @staticmethod
+    def calcular_status_pedido(tempo_limite_entrega, hora_pedido):
+        # Verifica se a data do pedido é igual ao dia atual
+        if hora_pedido.date() == date.today():
+            tempo_decorrido = datetime.now() - hora_pedido.date()
+            minutos_decorridos = tempo_decorrido.total_seconds() / 60  # Convertendo para minutos
+    
+            if minutos_decorridos <= tempo_limite_entrega:
+                return "Em andamento"
+            else:
+                return "Pronto para entrega"
+        else:
+            return "Data do pedido não corresponde ao dia atual"
+
+
