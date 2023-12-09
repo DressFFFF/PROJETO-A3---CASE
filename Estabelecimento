@@ -38,19 +38,19 @@ class Estabelecimento:
       while True:
           cursor = conexao.get_cursor()
           try:
-              cursor.execute("SELECT email FROM estabelecimento WHERE email = %s AND senha = %s", (email, senha))
+              cursor.execute("SELECT razaoSocial FROM estabelecimento WHERE email = %s AND senha = %s", (email, senha))
               resultado = cursor.fetchone()
               if resultado:
-                  print()
-                  print('Login bem-sucedido!')
-                  break
+                  self.nome_estabelecimento_autenticado = resultado[0]  # Armazena o nome do estabelecimento autenticado
+                  print('\nLogin bem-sucedido!')
+                  return True
               else:
-                  print()
                   print('Credenciais inválidas. Tente novamente.')
                   email = input('\nDigite seu e-mail: ')
                   senha = input('Digite sua senha: ')
           except Exception as e:
-              print(f"Erro durante o login: {e}")
+              print(f"\nErro durante o login: {e}")
+              return False
 
 # Função de verificação para o menu de login (identificar se é estabelecimento) ========
   
