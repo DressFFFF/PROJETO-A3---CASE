@@ -1,67 +1,93 @@
-# Importando o mysql connector para conectar com o banco de dados ======================
-
+# Importando o mysql connector para conectar com o banco de dados
 import mysql.connector
 
+# Definição da classe Database, que representa o banco de dados
 class Database:
     def __init__(self):
+# Estabelece uma conexão com o banco de dados
         self.conexao = mysql.connector.connect(
+# Endereço do host do banco de dados
             host="db4free.net",
+# Nome de usuário para autenticação no banco de dados
             user="jpsilvafr",
-            password=" ",
+# Senha para autenticação no banco de dados
+            password="45084508",
+# Nome do banco de dados a ser utilizado
             database="gofood"
         )
+# Cria um cursor para executar comandos no banco de dados
         self.cursor = self.conexao.cursor()
-      
 
-# Definindo função para retornar conexão com banco de dados ============================
-  
+
+ # _____________ Início das funções ________________
+
+# Método para gerenciar a conexão com o banco de dados
     def get_conexao(self):
+# Retorna o objeto de conexão atual
         return self.conexao
 
-# Definindo função para executar comandos no banco de dados ============================
-  
+##
+
+# Método para retornar o objeto de um cursor existente quando chamado
     def get_cursor(self):
+# Retorna o objeto de cursor atual
         return self.cursor
 
-# Definindo função para fechar conexão com banco de dados ==============================
+##
 
+# Método para fechar a conexão com o banco de dados
     def fechar_conexao(self):
+# Verifica se a conexão está aberta
       if self.conexao.is_connected():
+# Fecha o objeto do cursor
           self.cursor.close()
+# Fecha a conexão com o banco de dados
           self.conexao.close()
 
-# Definindo função para visualizar os restaurantes disponíveis =========================
+##
 
+# Método para buscar os estabelecimentos disponíveis no bando de dados
     def buscar_estabelecimentos(self):
+# Executa uma consulta SQL para selecionar CNPJ e Razão Social de todos os estabelecimentos
       self.get_cursor().execute("SELECT cnpj, razaoSocial FROM estabelecimento")
+# Recupera todos os resultados da consulta
       estabelecimentos = self.get_cursor().fetchall()
-  
-      print("Estabelecimentos Disponíveis:")
-      nomes_estabelecimentos = []  # Lista para armazenar apenas os nomes
+      print("\nEstabelecimentos Disponíveis:\n")
+# Lista para armazenar apenas os nomes
+      nomes_estabelecimentos = []
+# Itera sobre cada estabelecimento retornado pela consulta
       for estabelecimento in estabelecimentos:
+# Obtém o nome do estabelecimento (posição 1)
           nome_estabelecimento = estabelecimento[1]
+# Obtém o CNPJ do estabelecimento (posição 0)
           cnpj_estabelecimento = estabelecimento[0]
+# Adiciona o nome à lista de nomes
           nomes_estabelecimentos.append(nome_estabelecimento)
+# Imprime o nome e o CNPJ de cada estabelecimento
           print(f"{nome_estabelecimento} - CNPJ: {cnpj_estabelecimento}")
-  
+# Retorna uma tupla contendo a lista completa de estabelecimentos
       return estabelecimentos, nomes_estabelecimentos
-    
-# Função para lista os produtos ========================================================
 
+##
+
+# Método para buscar os produtos disponíveis no banco de dados
     def buscar_produtos_por_cnpj(self, cnpj):
       try:
+# Obtém um cursor para operações no banco de dados
           cursor = self.get_cursor()
+# Executa uma consulta SQL para selecionar os produtos pelo CNPJ do estabelecimento
           cursor.execute("SELECT descricao, valorVenda FROM produto WHERE fk_estabelecimento_cnpj = %s", (cnpj,))
+# Recupera todos os resultados da consulta
           produtos = cursor.fetchall()
-  
+# Verifica se há produtos associados ao CNPJ fornecido
           if produtos:
+# Retorna a lista de produtos encontrados
               return produtos
+# Retorna uma lista vazia se não houver produtos associados ao CNPJ
           else:
               return []
-  
+# Em caso de erro, imprime o erro ocorrido durante a busca
       except Exception as e:
           print(f"\nErro ao listar os produtos: {e}")
+# Retorna uma lista vazia se ocorrer um erro na busca dos produtos
           return []
-
-
-
