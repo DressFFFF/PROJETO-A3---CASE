@@ -11,7 +11,7 @@ class Database:
 # Nome de usuário para autenticação no banco de dados
             user="jpsilvafr",
 # Senha para autenticação no banco de dados
-            password="45084508",
+            password=" ",
 # Nome do banco de dados a ser utilizado
             database="gofood"
         )
