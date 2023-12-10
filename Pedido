@@ -1,58 +1,56 @@
-# Importando bibliotecas e classe database para o funcionamento ========================
-
+# Importa o módulo 're' para operações com expressões regulares
 import re
+# Importa a classe datetime para manipulação de objetos de data e hora
+from datetime import datetime
+# Importa a classe 'Database' para operações no banco de dados
 from Model.Database import Database
-from datetime import datetime, date
 
-
-
-# Definindo classe ClienteFinal e seu construtor =======================================
-
+# Definição da classe Pedido, que representa um pedido
 class Pedido:
+# Método construtor da classe com inicialização dos atributos do pedido
     def __init__(self, estabelecimento, produto, valorTotal):
+# Atributos da classe que serão armazenados como string
         self.estabelecimento = str(estabelecimento)
         self.produto = str(produto)
-        self.valorTotal = float(valorTotal)
+        self.valorTotal = str(valorTotal)
 
-# Definindo função para salvar o pedido no banco de dados ==============================
+# _____________ Início das funções ________________
 
+# Método para inserir um pedido no banco de dados
     def inserir_pedido(self, conexao):
       cursor = None
       try:
+# Obtém um cursor para operações no banco de dados
           cursor = conexao.get_cursor()
+# Executa uma instrução SQL para inserir informações do pedido na tabela 'pedido'
           cursor.execute(
               "INSERT INTO pedido (estabelecimento, produto, valorTotal) VALUES (%s, %s, %s);",
               (self.estabelecimento, self.produto, self.valorTotal)
           )
+# Realiza um commit para confirmar as alterações no banco de dados
           conexao.get_conexao().commit()
-          print('Pedido adicionado com sucesso!')
+# Exibe uma mensagem indicando o sucesso do pedido
+          print('\nPedido realizado com sucesso!')
+# Em caso de erro, imprime o erro ocorrido durante a inserção
       except Exception as e:
           print(f"Erro ao concluir o pedido: {e}")
 
+##
 
+# Método para buscar os pedidos no banco de dados
     @staticmethod
     def buscar_pedidos_por_estabelecimento(conexao, nome_estabelecimento):
+# Obtém um cursor para operações no banco de dados
         cursor = conexao.get_cursor()
         try:
+# Executa uma consulta SQL para selecionar produtos e valores de pedidos para um estabelecimento específico
             cursor.execute("SELECT produto, valorTotal FROM pedido WHERE estabelecimento = %s;", (nome_estabelecimento,))
+# Recupera todos os resultados da consulta
             pedidos = cursor.fetchall()
+# Retorna os pedidos encontrados para o estabelecimento
             return pedidos
+# Em caso de erro, imprime o erro ocorrido durante a busca
         except Exception as e:
             print(f"Erro ao buscar pedidos por estabelecimento: {e}")
+# Retorna None se houver um erro durante a busca dos pedidos
             return None
-    
-    @staticmethod
-    def calcular_status_pedido(tempo_limite_entrega, hora_pedido):
-        # Verifica se a data do pedido é igual ao dia atual
-        if hora_pedido.date() == date.today():
-            tempo_decorrido = datetime.now() - hora_pedido.date()
-            minutos_decorridos = tempo_decorrido.total_seconds() / 60  # Convertendo para minutos
-    
-            if minutos_decorridos <= tempo_limite_entrega:
-                return "Em andamento"
-            else:
-                return "Pronto para entrega"
-        else:
-            return "Data do pedido não corresponde ao dia atual"
-
-
