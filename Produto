@@ -1,29 +1,107 @@
-# Importação da classe database ========================================================
-
+# Importa a classe 'Database' para operações no banco de dados
 from Model.Database import Database
+# Importa o módulo 're' que oferece suporte a expressões regulares para manipulação de strings
+import re
 
-# Definição da classe Produto e seu construtor =========================================
-
+# Definição da classe Produto, que representa um produto
 class Produto:
+# Método construtor da classe com inicialização dos atributos do produto
   def __init__(self, descricao, valorVenda, quantidadeDisponivel, unidadeMedida, fk_estabelecimento_cnpj	):
+# Atributos da classe que serão armazenados
       self.descricao = descricao
       self.valorVenda = valorVenda
       self.quantidadeDisponivel = quantidadeDisponivel
       self.unidadeMedida = unidadeMedida
       self.fk_estabelecimento_cnpj = fk_estabelecimento_cnpj
 
-# Definição da função para cadastro do produto no sistema ==============================
+# _____________ Início das funções ________________
 
+# Método para cadastrar um produto no banco de dados
   def cadastrar_produto(self, conexao):
     cursor = None
     try:
+# Obtém um cursor para operações no banco de dados
         cursor = conexao.get_cursor()
+# Executa uma instrução SQL para inserir informações do produto na tabela 'produto'
         cursor.execute(
             "INSERT INTO produto (descricao, valorVenda, quantidadeDisponivel, unidadeMedida, fk_estabelecimento_cnpj) VALUES (%s, %s, %s, %s, %s);",
             (self.descricao, self.valorVenda, self.quantidadeDisponivel, self.unidadeMedida, self.fk_estabelecimento_cnpj)
         )
+# Realiza um commit para confirmar as alterações no banco de dados
         conexao.get_conexao().commit()
-        print('Cadastro do produto concluído!')
+# Exibe uma mensagem indicando o sucesso do cadastro
+        print('\nCadastro do produto concluído!')
+# Em caso de erro, imprime o erro ocorrido durante o cadastro
     except Exception as e:
-        print(f"Erro durante o cadastro do produto: {e}")
-      
+        print(f"\nErro durante o cadastro do produto: {e}")
+
+##
+
+# Método estático para validar a descrição do produto
+  @staticmethod
+  def validar_descricao(descricao):
+# Verifica se a descrição contém apenas letras e espaços, com no máximo 50 caracteres
+      if not re.match(r'^[a-zA-Z ]{1,50}$', descricao):
+          print("\nDescrição inválida, deve conter apenas letras.")
+# Retorna False se a descrição contiver caracteres inválidos
+          return False
+# Retorna True se a descrição estiver no formato correto
+      return True
+
+##
+  
+# Método estático para validar o valor de venda do produto
+  @staticmethod
+  def validar_valor_venda(valorVenda):
+      try:
+# Tenta converter o valorVenda para um número de ponto flutuante
+          valor = float(valorVenda)
+# Verifica se o valor está entre 0 e 100 e se não contém caracteres inválidos além de dígitos e ponto
+          if valor <= 100 and valor >= 0 and not re.search(r'[^\d.]', valorVenda):
+# Retorna True se o valor de venda estiver dentro dos critérios válidos
+              return True
+# Retorna False se o valor não estiver dentro dos critérios válidos
+          else:
+              print("\nValor de venda inválido. Deve ser um número válido.")
+              return False
+# Retorna False se ocorrer um erro na conversão para float (indicando que não é um número válido)
+      except ValueError:
+          print("\nValor de venda inválido. Deve ser um número válido.")
+          return False
+
+##
+
+# Método estático para validar a quantidade disponível do produto
+  @staticmethod
+  def validar_quantidade_disponivel(quantidade):
+      try:
+# Tenta converter a quantidade para um número inteiro
+          quantidade = int(quantidade)
+# Verifica se a quantidade está entre 0 e 1000
+          if quantidade >= 0 and quantidade <= 1000:
+# Retorna True se a quantidade estiver dentro dos critérios válidos
+              return True
+# Retorna False se a quantidade não estiver dentro dos critérios válidos
+          else:
+              print("\nQuantidade inválida. Deve ser um número inteiro.")
+              return False
+# Retorna False se ocorrer um erro na conversão (indicando que não é um número inteiro válido)
+      except ValueError:
+          print("\nQuantidade inválida. Deve ser um número inteiro.")
+          return False
+
+##  
+
+# Método estático para validara unidade de medida do produto
+  @staticmethod
+  def validar_unidade_medida(unidadeMedida):
+# Lista das unidades de medida válidas
+      unidades_validas = ['un', 'ml', 'kg']
+# Verifica se tem 2 caracteres e se está na lista de unidades válidas
+      if len(unidadeMedida) == 2 and unidadeMedida.lower() in unidades_validas:
+# Retorna True se a unidade de medida estiver na lista de unidades válidas
+          return True
+# Retorna False se a unidade de medida não estiver na lista de unidades válidas
+      else:
+          print("\nUnidade de medida inválida. Opções válidas: un, ml ou kg.")
+          return False
