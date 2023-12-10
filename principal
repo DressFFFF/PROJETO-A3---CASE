@@ -1,39 +1,48 @@
-# Importação de todas as classes e bibliotecas necessárias para o funcionamento ========
-from datetime import datetime, date
+#Importa o módulo 're' para trabalhar com expressões regulares
+import re
+
+# Importa o módulo 'time' para lidar com operações relacionadas ao tempo
 import time
+
+# Importa classes específicas do modelo:
 from Model.ClienteFinal import ClienteFinal
+from Model.Database import Database
 from Model.Estabelecimento import Estabelecimento
 from Model.Pedido import Pedido
 from Model.Produto import Produto
-from Model.Database import Database
 
 
-
+# Cria uma instância da classe Database para gerenciar conexões
 conexao = Database()
 
-# Início do programa ===================================================================
-
+# Verifica se o script está sendo executado diretamente como o programa principal
 if __name__ == "__main__":
     print('Bem-vindo ao Go! Food\n')
+
+# Pausa a execução do programa por 2 segundos
     time.sleep(2)
 
+# Inicia um loop infinito para manter o programa em execução até uma condição de saída
     while True:
+
+# Solicita ao usuário que insira uma opção e armazena essa entrada em 'tipo_cadastro'
         tipo_cadastro = input('''
 O que deseja fazer?
 
 [C] - Cadastro de usuário ou restaurante
 [L] - Realizar o login
-[S] - Para sair\n\n''').upper()
+[S] - Sair do programa\n\n'''
+).upper() # upper utilizado para garantir a conversão para letras maiúsculas
 
-# Condição para encerrar o programa ====================================================
-
+# Verifica se a opção digitada é S, para fechar conexão e encerrar o programa
         if tipo_cadastro.upper() == 'S':
             conexao.fechar_conexao()
             break
 
-# Condição para realizar o cadastro de usuário ou restaurante ==========================
-
+# Verifica se a opção digitada é C, para iniciar o menu de cadastro
         elif tipo_cadastro.upper() == 'C':
+# Inicia um novo loop infinito para oferecer opções de cadastro
+          while True:
             tipo_cadastro = input('''
 Menu de Cadastro
 
@@ -41,135 +50,319 @@ Escolha uma das opções:
 
 [U] - Cadastro de usuário
 [R] - Cadastro de um restaurante e produto
-[B] - Voltar\n\n''').upper()
+[V] - Voltar ao menu anterior\n\n'''
+).upper() # upper utilizado para garantir a conversão para letras maiúsculas
 
-# Condição para realizar o cadastro de usuário =========================================
+# Verifica se a opção digitada é V, para retornar ao menu anterior
+            if tipo_cadastro.upper() == 'V':
+              break
+              
 
+# ___________________ Início do fluxo de cadastro do usuário __________________________
+            
+# Verifica se a opção digitada é U, para iniciar o cadastro de usuário
             if tipo_cadastro.upper() == 'U':                                  
                 print('\nVamos criar sua conta!\n')
 
-# Usuário realizar input do cpf para iniciar o cadastro ================================
-              
+# Solicita ao usuário que insira o número do CPF e armazena essa entrada em 'cpf'
                 cpf = input('Digite seu CPF: ')
-
-# Lógica que chama a função para validar o cpf ========================================
-
                 while not ClienteFinal.validar_cpf(cpf):
+# Enquanto o CPF inserido não for válido, executa o seguinte:
                   print('\nCPF inválido! Por favor, digite um CPF válido.')
+# Solicita ao usuário que insira o CPF novamente para validação
                   cpf = input('\nDigite seu CPF: ')
 
-                while not ClienteFinal.validar_cpf(cpf):
-                    print('\nCPF inválido! Por favor, digite um CPF válido.')
-                    cpf = input('\nDigite seu CPF: ')
-
-# Usuário realiza input do nome para continuar o cadastro ==============================
-
+##
+              
+# Solicita ao usuário que insira seu nome completo
                 nome = input('Digite seu nome completo: ')
+# Chama o método 'validar_nome' para validar o nome inserido
                 nome_validado = ClienteFinal.validar_nome(nome)
-
-# Lógica que chama a função para validar o nome do usuário =============================
-
+# Enquanto o nome validado for considerado inválido retorna None
                 while nome_validado is None:
                     print('\nNome inválido! Por favor, digite um nome válido.')
+# Solicita ao usuário que insira novamente o nome completo para validação
                     nome = input('\nDigite seu nome completo: ')
+# Chama o método 'validar_nome' para validar o nome inserido novamente
                     nome_validado = ClienteFinal.validar_nome(nome)
 
-# Usuário realiza input do telefone para continuar o cadastro ==========================
+##
               
+# Solicita ao usuário que insira o seu número de telefone
                 telefone = input('Digite seu telefone: ')
-
-# Lógica que chama a função para validar o telefone do usuário =========================
-              
+# Chama o método 'validar_telefone' para validar o número de telefone inserido
                 telefone_validado = ClienteFinal.validar_telefone(telefone)
+# Enquanto o telefone validado for considerado inválido retorna None
                 while telefone_validado is None:
                     print('\nTelefone inválido! Por favor, digite um telefone válido.')
+# Solicita ao usuário que insira novamente o telefone para validação
                     telefone = input('\nDigite seu telefone: ')
+# Chama o método 'validar_telefone' para validar o número de telefone inserido novamente
                     telefone_validado = ClienteFinal.validar_telefone(telefone)
 
-# Usuário realiza input do email para continuar o cadastro =============================
-
-                email = input('Digite seu melhor e-mail: ')
-
-# Lógica que chama a função para validar o e-mail do usuário ===========================
+##
               
+# Solicita ao usuário que insira o seu e-mail
+                email = input('Digite seu melhor e-mail: ')
+# Chama o método 'validar_email' para validar o e-mail inserido
                 email_validado = ClienteFinal.validar_email(email)
+# Enquanto o e-mail validado for considerado inválido retorna None
                 while email_validado is None:
                     print('\nE-mail inválido! Por favor, digite um e-mail válido.')
+# Solicita ao usuário que insira novamente o e-mail para validação
                     email = input('\nDigite seu melhor e-mail: ')
+# Chama o método 'validar_email' para validar o e-mail inserido novamente
                     email_validado = ClienteFinal.validar_email(email)
 
-# Usuário realiza o input da data de nascimento para continuar o cadastro ==============
-    
+##
+              
+# Solicita ao usuário que insira a data de nascimento    
                 dataNascimento = input('Digite sua data de nascimento: ')
-
-# Lógica que chama a função para validar a data de nascimento do usuário ===============
-
+# Chama o método 'validar_data_nascimento' para validar a data inserida
                 data_nascimento_validada = ClienteFinal.validar_data_nascimento(dataNascimento)
+# Enquanto a data validada for considerada inválida retorna None
                 while data_nascimento_validada is None:
                     print('\nData de nascimento inválida. Formato aceito: ano-mês-dia')
-                    dataNascimento = input('\nDigite sua data de nascimento (ano-mês-dia): ')
+# Solicita ao usuário que insira novamente a data para validação
+                    dataNascimento = input('\nDigite sua data de nascimento: ')
+# Chama o método 'validar_data_nascimento' para validar a data inserida novamente
                     data_nascimento_validada = ClienteFinal.validar_data_nascimento(dataNascimento)
 
-# Usuário realiza o input do endereço para continuar o cadastro ========================
-              
+##
+
+# Solicita ao usuário que insira o endereço
                 endereco = input('Digite seu endereço: ')
-
-# Lógica que chama a função para validar o endereço do usuário =========================
-            
+# Chama o método 'validar_endereco' para validar o endereço inserido      
                 endereco_validado = ClienteFinal.validar_endereco(endereco)
+# Enquanto o endereço validado for considerado inválido retorna None
                 while endereco_validado is None:
+# Solicita ao usuário que insira novamente o endereço para validação                  
                     endereco = input('\nDigite seu endereço: ')
+# Chama o método 'validar_endereco' para validar o endereço inserido novamente
                     endereco_validado = ClienteFinal.validar_endereco(endereco)
-                
+
+##
+
+# Solicita ao usuário que insira a senha
                 senha = input('Crie sua senha: ')
-                
-                pass
+# Chama o método 'validar_cliente_senha' para validar a senha
+                senha_cliente_validada = ClienteFinal.validar_cliente_senha(senha)
+# Enquanto a senha inserida for considerada inválida, retorna None
+                while senha_cliente_validada is None:
+                    print('\nSenha inválida! A senha precisa ter 8 caracteres.')
+# Solicita ao usuário que insira a senha novamente para validação
+                    senha = input('\nCrie sua senha: ')
+# Chama o método 'validar_senha' para validar a senha novamente
+                    senha_cliente_validada = ClienteFinal.validar_cliente_senha(senha)
+
+##
               
+# Cria um objeto 'usuario' da classe 'ClienteFinal' com os dados fornecidos pelo usuário
                 usuario = ClienteFinal(cpf, nome, telefone, email, dataNascimento, endereco, senha)
+# Chama o método 'cadastrar_usuario' para cadastrar o usuário no banco de dados
                 usuario.cadastrar_usuario(conexao)
+              
 
-# Condição para realizar o cadastro de um restaurante e produto =======================
+# ___________________ Início do fluxo de cadastro do restaurante __________________________
 
+# Verifica se a opção digitada é R, para iniciar o cadastro de restaurante
             elif tipo_cadastro.upper() == 'R':
                 print('\nVamos criar sua conta!\n')
-                cnpj = input('Digite seu CNPJ: ')
-                razaoSocial = input('Digite o nome do restaurante (Razão Social): ')
-                email = input('Digite o seu melhor e-mail: ')
-                telefone = input('Digite seu telefone: ')
-                segmento = input('Digite o segmento do seu estabelecimento (Alimentício, Bebidas): ')
-                endereco = input('Digite seu endereço: ')
-                horarioAbertura = input('Digite o horário de abertura do estabelecimento: ')
-                horarioFechamento = input('Digite o horário de fechamento do estabelecimento: ')
-                senha = input('Crie sua senha: ')
 
+# Solicita ao usuário que insira o cnpj
+                cnpj = input('Digite seu CNPJ: ')
+                while not Estabelecimento.validar_estab_cnpj(cnpj):
+# Enquanto o CNPJ inserido não for válido, executa o seguinte:
+                  print('\nCNPJ inválido! Por favor, digite um CNPJ válido.')
+# Solicita ao usuário que insira o CNPJ novamente para validação
+                  cnpj = input('\nDigite seu CNPJ: ')
+
+##
+
+# Solicita ao usuário que insira a razão social              
+                razaoSocial = input('Digite o nome do restaurante: ')
+                while not Estabelecimento.validar_estab_rsocial(razaoSocial):
+# Enquanto a razão social inserida não for válida, executa o seguinte:
+                  print('\nRazão Social inválida! Por favor, digite uma razão social válida.')
+# Solicita ao usuário que insira a razão social novamente para validação
+                  razaoSocial = input('\nDigite o nome do restaurante: ')
+
+##
+              
+# Solicita ao usuário que insira o e-mail
+                email = input('Digite o seu melhor e-mail: ')
+# Chama o método 'validar_estab_email' para validar o e-mail inserido
+                email_estab_validado = Estabelecimento.validar_estab_email(email)
+# Enquanto o e-mail inserido for considerado inválido, retorna None
+                while email_estab_validado is None:
+                    print('\nE-mail inválido! Por favor, digite um e-mail válido.')
+# Solicita ao usuário que insira o e-mail novamente para validação
+                    email = input('\nDigite seu melhor e-mail: ')
+# Chama o método 'validar_estab_email' para validar o e-mail inserido novamente
+                    email_validado = Estabelecimento.validar_estab_email(email)
+
+##
+
+# Solicita ao usuário que insira o telefone            
+                telefone = input('Digite seu telefone: ')
+# Chama o método 'validar_estab_telefone' para validar o telefone inserido
+                telefone_estab_validado = Estabelecimento.validar_estab_telefone(telefone)
+# Enquanto o telefone inserido for considerado inválido, retorna None
+                while telefone_estab_validado is None:
+                    print('\nTelefone inválido! Por favor, digite um telefone válido.')
+# Solicita ao usuário que insira o telefone novamente para validação
+                    telefone = input('\nDigite seu telefone: ')
+# Chama o método 'validar_estab_telefone' para validar o telefone inserido novamente
+                    telefone_estab_validado  = Estabelecimento.validar_estab_telefone(telefone)
+
+##
+
+# Solicita ao usuário que insira o segmento
+                segmento = input('Digite o segmento do seu estabelecimento: ')
+# Chama o método 'validar_estab_segmento' para validar o segmento inserido
+                segmento_estab_validado = Estabelecimento.validar_estab_segmento(segmento)
+# Enquanto o segmento inserido for considerado inválido, retorna None
+                while segmento_estab_validado is None:
+                    print('\nSegmento inválido! Ex: Restaurante, Adega.')
+# Solicita ao usuário que insira o segmento novamente para validação
+                    segmento = input('\nDigite o segmento do seu estabelecimento: ')
+# Chama o método 'validar_estab_segmento' para validar o segmento inserido novamente
+                    segmento_estab_validado = Estabelecimento.validar_estab_segmento(segmento)
+
+##
+              
+# Solicita ao usuário que insira o endereço
+                endereco = input('Digite seu endereço: ')
+# Chama o método 'endereco_estab_validado' para validar o endereço
+                endereco_estab_validado = Estabelecimento.endereco_estab_validado(endereco)
+# Enquanto o endereço inserido for considerado inválido, retorna None
+                while endereco_estab_validado is None:
+# Solicita ao usuário que insira o endereço novamente para validação
+                    endereco = input('\nDigite seu endereço: ')
+# Chama o método 'endereco_estab_validado' para validar o endereço novamente
+                    endereco_estab_validado = Estabelecimento.endereco_estab_validado(endereco)
+
+##
+                  
+# Solicita ao usuário que insira o horário de abertura
+                horarioAbertura = input('Digite o horário de abertura do estabelecimento: ')
+# Chama o método 'validar_horario_abertura' para validar o horário de abertura
+                horario_abertura = Estabelecimento.validar_horario_abertura(horarioAbertura)
+# Enquanto o horário de abertura inserido for considerado inválido, retorna None
+                while horario_abertura is None:
+                    print('\nHorário inválido! Ex: 16:00')
+# Solicita ao usuário que insira o horário de abertura novamente para validação
+                    horarioAbertura = input('\nDigite o horário de abertura do estabelecimento: ')
+# Chama o método 'validar_horario_abertura' para validar o horário de abertura novamente
+                    horario_validado = Estabelecimento.validar_horario_abertura(horarioAbertura)
+
+##
+
+# Solicita ao usuário que insira o horário de fechamento
+                horarioFechamento = input('Digite o horário de fechamento do estabelecimento: ')
+# Chama o método 'validar_horario_fechamento' para validar o horário de fechamento
+                horario_fech = Estabelecimento.validar_horario_fechamento(horarioFechamento)
+# Enquanto o horário de fechamento inserido for considerado inválido, retorna None
+                while horario_fech is None:
+                    print('\nHorário inválido! Ex: 23:00')
+# Solicita ao usuário que insira o horário de fechamento novamente para validação
+                    horarioFechamento = input('\nDigite o horário de fechamento do estabelecimento: ')
+# Chama o método 'validar_horario_fechamento' para validar o horário de fechamento novamente
+                    horario_fech = Estabelecimento.validar_horario_fechamento(horarioFechamento)
+
+##
+              
+# Solicita ao usuário que insira a senha
+                senha = input('Crie sua senha: ')
+# Chama o método 'validar_senha' para validar a senha
+                senha_validada = Estabelecimento.validar_senha(senha)
+# Enquanto a senha inserida for considerada inválida, retorna None
+                while senha_validada is None:
+                    print('\nSenha inválida! A senha precisa ter 8 caracteres.')
+# Solicita ao usuário que insira a senha novamente para validação
+                    senha = input('\nCrie sua senha: ')
+# Chama o método 'validar_senha' para validar a senha novamente
+                    senha_validada = Estabelecimento.validar_senha(senha)
+
+##              
+
+# Cria um objeto 'restaurante' da classe 'Estabelecimento' com os dados fornecidos pelo usuário
                 restaurante = Estabelecimento(cnpj, razaoSocial, email, telefone, segmento, endereco, horarioAbertura, horarioFechamento, senha)
+# Chama o método 'cadastrar_estabelecimento' para cadastrar o estabelecimento no banco de dados
                 restaurante.cadastrar_estabelecimento(conexao)
 
-# Continuação da condição R, seguindo para o cadastro do produto =======================
 
+# ___________________ Início do fluxo de cadastro do produto __________________________
+
+# Pausa a execução do programa por 1 segundo
                 time.sleep(1)
-                while True:
-                  print('''\nAgora vamos cadastrar o produto do estabelecimento!\n''')
+                print('''\nAgora vamos cadastrar o produto do estabelecimento!\n''')
+# Inicia um loop infinito para realizar o cadastro de produtos
+                while True:     
+# Solicita ao usuário que insira a descrição do produto
                   descricao = input('Digite o nome do produto: ')
+                  while not Produto.validar_descricao(descricao):
+# Enquanto a descrição do produto inserida não for válida, executa o seguinte:
+                    descricao = input('\nDigite o nome do produto: ')
+
+##
+
+# Solicita ao usuário que insira o valor de venda
                   valorVenda = input('Digite o valor de venda: ')
+                  while not Produto.validar_valor_venda(valorVenda):
+# Enquanto o valor de venda inserido não for válido, executa o seguinte:
+                    valorVenda = input('\nDigite o valor de venda: ')
+
+##
+                  
+# Solicita ao usuário que insira a quantidade disponível no estoque
                   quantidadeDisponivel = input('Digite a quantidade disponível no estoque: ')
-                  unidadeMedida = input('Digite a unidade (un, ml): ')
+                  while not Produto.validar_quantidade_disponivel(quantidadeDisponivel):
+# Enquanto a quantidade disponível inserida não for válida, executa o seguinte:
+                    quantidadeDisponivel = input('\nDigite a quantidade disponível no estoque: ')
+
+##
+                  
+# Solicita ao usuário que insira a unidade de medida
+                  unidadeMedida = input('Digite a unidade (un, ml ou kg): ')
+                  while not Produto.validar_unidade_medida(unidadeMedida):
+# Enquanto a unidade de medida inserida não for válida, executa o seguinte:
+                    unidadeMedida = input('\nDigite a unidade (un, ml ou kg): ')
+
+##
+                  
+# Estabelece que o cnpj colocado no início seja sempre o mesmo
                   fk_estabelecimento_cnpj = cnpj
 
+##
+                
+# Cria um objeto 'pratos' da classe 'Produto' com os dados fornecidos pelo usuário
                   pratos = Produto(descricao, valorVenda, quantidadeDisponivel, unidadeMedida, fk_estabelecimento_cnpj)
+# Chama o método 'cadastrar_produto' para cadastrar os produtos no banco de dados
                   pratos.cadastrar_produto(conexao)
 
+##
+
+# Solicita ao usuário a escolha de adicionar mais um item ao cadastro
                   adicionar_outro = input('''
 Deseja adicionar mais um?
 
 [S] - Sim
-[N] - Não\n\n''').upper()
+[N] - Não\n\n'''
+).upper() # upper utilizado para garantir a conversão para letras maiúsculas
                   if adicionar_outro.upper() != 'S':
+# Se a escolha não for 'S' (sim), executa o seguinte:
+                    print('\nCadastro concluído!')
+# Interrompe o loop de cadastro, finalizando essa operação
                     break
 
-# Lógica para seguir para o login do usuário ou do estabelecimento =====================
-      
+
+# ___________________ Início do fluxo de login __________________________
+
+# Verifica se a opção escolhida é igual L para o login
         elif tipo_cadastro.upper() == 'L':
+# Inicia um loop infinito para oferecer opções de login
+          while True:
             tipo_login = input('''
 Para realizar o login,
 
@@ -177,165 +370,210 @@ Escolha uma das opções:
 
 [U] - Usuário
 [R] - Restaurante
-[B] - Voltar\n\n''').upper()
+[V] - Voltar ao menu anterior\n\n'''
+).upper() # upper utilizado para garantir a conversão para letras maiúsculas
 
-# Lógica para que o usuário realize o login no sistema =================================
-          
+# Se a opção escolhida para login for 'V', voltará ao menu anterior
+            if tipo_login.upper() == 'V':
+              break
+
+##            
+
+# ___________________ Início do fluxo de login do usuário __________________________
+            
+# Se a opção escolhida para login for 'U', executa o seguinte:
             if tipo_login == 'U':
+# Solicita ao usuário que insira o e-mail e a senha
                 usuario = input('\nDigite seu e-mail: ')
                 senha = input('Digite sua senha: ')
-
+# Inicializa um objeto ClienteFinal para o usuário
                 cliente = ClienteFinal("", "", "", "", "", "", "")
+# Realiza o login do usuário com as credenciais fornecidas
                 cliente.fazer_login(conexao, usuario, senha)
-              
+# Verifica o tipo de usuário após o login (se está cadastrado)
                 tipo_usuario = cliente.verificar_tipo_usuario()
 
+##
+
+# Se o tipo de usuário for "cliente", executa o seguinte:
                 if tipo_usuario == 'cliente':
-                  visualizar_menu = input('''
+                  
+# Inicia um loop infinito para apresentar o menu ao cliente após o login bem-sucedido
+                    while True:
+                      visualizar_menu = input('''
 Seja bem-vindo cliente!           
 
 Escolha uma da opções:
 
 [P] - Realizar um pedido
-[V] - Visualizar pedidos
-[S] - Sair do App
-\n''').upper()
+[L] - Fazer logoff
+\n\n'''
+).upper() # upper utilizado para garantir a conversão para letras maiúsculas
 
-                  if visualizar_menu == 'P':
+# Se a opção escolhida for 'L', interrompe o loop do menu
+                      if visualizar_menu == 'L':
+                        break
 
-                  # Busca e exibe os estabelecimentos disponíveis para seleção
-                    estabelecimentos, nomes_estabelecimentos = conexao.buscar_estabelecimentos()
+##
 
-                  # Solicita ao usuário que digite o nome do estabelecimento desejado
-                    nome_estabelecimento = input("\nDigite o estabelecimento desejado: ")
 
-                  # Encontra o CNPJ do estabelecimento selecionado
-                    cnpj_estabelecimento_escolhido = None
-                    for idx, nome in enumerate(nomes_estabelecimentos):
-                        if nome == nome_estabelecimento:
-                            cnpj_estabelecimento_escolhido = estabelecimentos[idx][0]
+# ___________________ Início do fluxo de pedido do usuário __________________________
 
-                  # Busca os produtos disponíveis no estabelecimento selecionado
-                    produtos_estabelecimento = conexao.buscar_produtos_por_cnpj(cnpj_estabelecimento_escolhido)
-                    print("\nProdutos Disponíveis:\n")
-                    for produto in produtos_estabelecimento:
-                        print(f"{produto[0]} - Valor: {produto[1]}")
+# ______ Bloco para listagem e input do estabelecimento desejado _________
+                      
+# Se a opção escolhida for 'P', inicia um loop para mostrar os estabelecimentos
+                      if visualizar_menu == 'P':
+                        while True:
+# Busca e exibe os estabelecimentos disponíveis para seleção
+                            estabelecimentos, nomes_estabelecimentos = conexao.buscar_estabelecimentos()
+# Solicita ao usuário que digite o nome do estabelecimento
+                            nome_estabelecimento = input("\nDigite o estabelecimento desejado: ")
+# Verifica se o nome do estabelecimento está na lista
+                            if nome_estabelecimento in nomes_estabelecimentos:
+# Inicializa a variável que armazenará o CNPJ do estabelecimento escolhido como None
+                                cnpj_estabelecimento_escolhido = None
+# Itera sobre os nomes dos estabelecimentos com seus índices usando 'enumerate'
+                                for idx, nome in enumerate(nomes_estabelecimentos):
+# Se o nome do estabelecimento for igual ao nome selecionado
+                                    if nome == nome_estabelecimento:
+# Atribui o CNPJ do estabelecimento correspondente à variável 'cnpj_estabelecimento_escolhido'
+                                        cnpj_estabelecimento_escolhido = estabelecimentos[idx][0]
+# Interrompe o loop após encontrar o estabelecimento desejado
+                                        break
 
-                    valorTotal = 0.0
-                    produtos_pedido = []
+##
 
-                  # Solicita ao usuário que selecione produtos para adicionar ao pedido
-                    while True:
-                        nome_produto = input("\nDigite o produto que deseja ou 'S' para sair: ")
-                        if nome_produto.upper() == 'S':
-                            break
+# ______ Bloco para listagem e input do produto desejado _________
+                              
+# Busca os produtos disponíveis usando o CNPJ do estabelecimento inserido
+                                produtos_estabelecimento = conexao.buscar_produtos_por_cnpj(cnpj_estabelecimento_escolhido)
+                                print("\nProdutos Disponíveis:\n")
+# Itera sobre a lista de produtos obtidos para exibi-los
+                                for produto in produtos_estabelecimento:
+# Imprime o nome do produto e seu valor
+                                    print(f"{produto[0]} - Valor: {produto[1]}")
+# Encerra o loop pois o estabelecimento é válido
+                                break
+# Se o estabelecimento não foi encontrado retornar para o loop
+                            else:
+                                print("\nEstabelecimento não localizado! Digite um estabelecimento disponível.")
+# Inicializa variáveis para o valor total do pedido e a lista de produtos do pedido
+                        valorTotal = 0.0
+                        produtos_pedido = []
+# Inicializa um loop para adicionar vários produtos
+                        while True:
+# Solicita ao usuário que digite o produto para adicionar ao pedido
+                            nome_produto = input("\nDigite o produto que deseja ou 'S' para sair: ")
+# Se a entrada do usuário for 'S', sai do loop e encerra a seleção de produtos
+                            if nome_produto.upper() == 'S':
+                                break
+# Inicializa uma variável para controlar se o produto foi encontrado
+                            produto_encontrado = False
+# Itera sobre os produtos disponíveis do estabelecimento
+                            for produto in produtos_estabelecimento:
+# Verifica se o nome do produto inserido corresponde a um produto disponível
+                                if nome_produto == produto[0]:
+# Adiciona o produto à lista de produtos do pedido
+                                    produtos_pedido.append(produto)
+# Adiciona o valor do produto ao valor total do pedido
+                                    valorTotal += float(produto[1])
+# Define que o produto foi encontrado
+                                    produto_encontrado = True
+# Interrompe o loop após encontrar o produto desejado
+                                    break
+# Se o produto não foi encontrado na lista, exibe uma mensagem e voltar para o loop
+                            if not produto_encontrado:
+                              print("\nProduto não localizado! Digite um produto disponível.")
 
-                  # Verifica se o produto selecionado está disponível no estabelecimento
-                        for produto in produtos_estabelecimento:
-                            if nome_produto == produto[0]:
-                                produtos_pedido.append(produto)
-                                valorTotal += float(produto[1])
+                            else:
+# Pergunta ao usuário se deseja adicionar mais um produto ao pedido
+                              adicionar_outro = input('''
+\nDeseja adicionar mais um produto?
+      
+[S] - Sim
+[N] - Não
+\n'''
+).upper() # upper utilizado para garantir a conversão para letras maiúsculas
+                              
+                              if adicionar_outro != 'S':
+# Se a resposta não for 'S' (sim), o loop de adição de produtos é encerrado
+                                  break
+    
+# Exibe o valor total do pedido para confirmação
+                        print("\nValor Total do Pedido:", valorTotal)
+                        confirmacao_pedido = input('''
+\nDeseja confirmar o pedido?
+    
+[S] - Sim
+[N] - Não
+\n'''
+).upper() # upper utilizado para garantir a conversão para letras maiúsculas
+    
+# Se a confirmação for 'S', cria o pedido e insere no banco de dados
+                        if confirmacao_pedido == 'S':
+# Coleta os nomes dos produtos escolhidos para o pedido
+                          nomes_produtos = [produto[0] for produto in produtos_pedido]
+# Converte o valor total para float, se ainda não estiver nesse formato
+                          valorTotal = float(valorTotal)
+# Agrupa os nomes dos produtos em uma única string separada por vírgulas
+                          produtos_juntos = ', '.join(nomes_produtos)
+# Cria um objeto 'pedido_finalizado' da classe 'Pedido' com os dados fornecidos pelo usuário
+                          pedido_finalizado = Pedido(nome_estabelecimento, produtos_juntos, valorTotal)
+# Chama o método 'inserir_pedido' para inserir o pedido no banco de dados
+                          pedido_finalizado.inserir_pedido(conexao)
+# Tempo para avisar que está em andamento
+                          time.sleep(2)
+# Exibe mensagem para avisar que está em andamento
+                          print('\nO seu pedido está sendo preparado...')
+                          time.sleep(5)
+# Exibe mensagem para avisar que saiu para entrega
+                          print('\nO seu pedido saiu para entrega')
 
-                        adicionar_outro = input('''
-                  \nDeseja adicionar mais um produto?
+##
 
-                  [S] - Sim
-                  [N] - Não
-                  \n''').upper()
-                        if adicionar_outro != 'S':
-                            break
-
-                  # Exibe o valor total do pedido para confirmação
-                    print("\nValor Total do Pedido:", valorTotal)
-                    confirmacao_pedido = input('''
-                  \nDeseja confirmar o pedido?
-
-                  [S] - Sim
-                  [N] - Não
-                  \n''').upper()
-
-                  # Se a confirmação for 'S', cria o pedido e insere no banco de dados
-                    if confirmacao_pedido == 'S':
-
-                  # Coleta os nomes dos produtos escolhidos para o pedido
-                      nomes_produtos = [produto[0] for produto in produtos_pedido]
-
-                      valorTotal = float(valorTotal)
-
-                  # Agrupa os nomes dos produtos em uma única string separada por vírgulas
-                      produtos_juntos = ', '.join(nomes_produtos)
-
-                  # Cria o pedido com os produtos e o valor total e insere no banco
-                      pedido_finalizado = Pedido(nome_estabelecimento, produtos_juntos, valorTotal)
-                      pedido_finalizado.inserir_pedido(conexao)
-                    
-                  # Status do pedido em andamento....  
-                      print('\n Aguarde a confirmação do pedido.')
-                      time.sleep(10)
-                      print('\n Está em Andamento')
-                      time.sleep(20)
-                      print('\n Saiu para entrega')
-                  
-# Lógica para que o estabelecimento reaCize o login no sistema =========================
-
+# ___________________ Início do fluxo de login do restaurante ______________________
+          
+# Se a opção escolhida for 'R' (restaurante), executa o seguinte:
             if tipo_login == 'R':
+# Solicita ao restaurante que insira o e-mail e a senha
               estabelecimento = input('\nDigite seu e-mail: ')
               senha = input('Digite sua senha: ')
-
+# Cria um objeto vazio de Estabelecimento para ser preenchido com as informações do restaurante
               restaurante = Estabelecimento("", "", "", "", "", "", "", "", "")
+# Realiza o login do restaurante com as credenciais fornecidas
               restaurante.fazer_login(conexao, estabelecimento, senha)
-
+# Verifica o tipo de estabelecimento após o login e caso inválido retornar para o loop
               tipo_estabelecimento = restaurante.verificar_tipo_estabelecimento()
-              
+
+# Se o tipo de estabelecimento após o login for um restaurante, executa o seguinte:
               if tipo_estabelecimento == 'restaurante':
-                visualizar_menu1 = input('''
+                  while True:
+# Exibe um menu para o restaurante com opções para visualizar pedidos ou fazer logoff
+                      visualizar_menu = input('''
 Seja bem-vindo restaurante!
-
+            
 Escolha uma das opções:
+            
+[T] - Visualizar todos os pedidos
+[L] - Fazer logoff
+\n''').upper() # upper utilizado para garantir a conversão para letras maiúsculas
 
-[T] - Visualizar pedidos em andamento 
-[A] - Visualizar pedidos entregues
-''').upper()
-
-
-                if visualizar_menu1 == 'T':
-                
-                  estabelecimento = restaurante.nome_estabelecimento_autenticado
-                  pedidos_em_andamento = Pedido.buscar_pedidos_por_estabelecimento(conexao, estabelecimento)
-                
-                  if pedidos_em_andamento:
-                      print("\nPedidos:")
-                      for pedido_str, valor_total in pedidos_em_andamento:
-                          print(f"\nPedido: {pedido_str} - Valor Total: {valor_total}")
-                  else:
-                      print("\nNão há pedidos para este estabelecimento.")
-                elif visualizar_menu1 == 'S':
-                  break
-                else:
-                   print("\nOpção inválida. Por favor, escolha uma opção válida.")
-
-
-                if visualizar_menu1 == 'A':
-                  pedidos_em_andamento = Pedido.buscar_pedidos_por_estabelecimento(conexao, estabelecimento)
-
-                  if pedidos_em_andamento:
-                      print("\nPedidos em andamento:")
-                      for pedido_str, valor_total in pedidos_em_andamento:
-                          try:
-                              cursor = conexao.get_cursor()
-                              cursor.execute("SELECT dataHorario FROM pedido WHERE estabelecimento = %s AND produto = %s AND valorTotal = %s;", (estabelecimento, pedido_str, valor_total))
-                              resultado = cursor.fetchone()
-                              hora_pedido = resultado[0] if resultado else datetime.now()
-
-                              status_pedido = Pedido.calcular_status_pedido(tempo_limite_entrega=30, hora_pedido=hora_pedido)
-
-                              print(f"\nPedido: {pedido_str} - Valor Total: {valor_total} - Status: {status_pedido}")
-                          except Exception as e:
-                              print(f"Erro ao buscar hora do pedido: {e}")
-                  else:
-                      print("\nNão há pedidos em andamento para este estabelecimento.")
-            # elif visualizar_menu == 'S':
-            #     break
-            # else:
-            #     print("\nOpção inválida. Por favor, escolha uma opção válida.")
-        
+# Se a opção escolhida for 'L', interrompe o loop, possibilitando fazer logoff
+                      if visualizar_menu == 'L':
+                        break
+# Se a opção escolhida for 'T', executa o seguinte:
+                      if visualizar_menu == 'T':
+# Obtém o nome do estabelecimento autenticado
+                          estabelecimento = restaurante.nome_estabelecimento_autenticado
+# Busca os pedidos para o estabelecimento autenticado
+                          pedidos_em_andamento = Pedido.buscar_pedidos_por_estabelecimento(conexao, estabelecimento)
+                          if pedidos_em_andamento:
+                              print("\nPedidos:")
+# Exibe informações sobre os pedidos
+                              for pedido_str, valor_total in pedidos_em_andamento:
+                                  print(f"\nPedido: {pedido_str} - Valor Total: {valor_total}")
+# Se não houver pedidos, exibe uma mensagem indicando isso
+                          else:
+                              print("\nNão há pedidos para este estabelecimento.")
+# Aguarda um input do usuário para retornar ao menu após visualizar os pedidos
+                      input("\nPressione Enter para voltar ao menu...")
