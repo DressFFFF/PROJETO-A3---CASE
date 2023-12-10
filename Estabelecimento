@@ -1,12 +1,15 @@
-# Importação da biblioteca time e do banco de dados ====================================
-
-import time
+# Importação da biblioteca re, que é utilizada para operações de expressões regulares
+import re
+# Importação da classe Database do arquivo Model.Database para interação com o banco de dados
 from Model.Database import Database
+# Importação da biblioteca time para lidar com funções relacionadas ao tempo
+import time
 
-# Definição da classe Estabelecimento e seu construtor =================================
-
+# Definição da classe Estabelecimento, que representa um estabelecimento comercial
 class Estabelecimento:
+# Método construtor da classe com inicialização dos atributos do estabelecimento
     def __init__(self, cnpj, razaoSocial, email, telefone, segmento, endereco, horarioAbertura, horarioFechamento, senha):
+# Atributos da classe que serão armazenados como string
         self.cnpj = str(cnpj)
         self.razaoSocial = str(razaoSocial)
         self.email = str(email)
@@ -17,45 +20,184 @@ class Estabelecimento:
         self.horarioFechamento = str(horarioFechamento)
         self.senha = str(senha)
 
-# Função para cadastro do estabelecimento no banco =====================================
-
+# _____________ Início das funções ________________
+  
+# Método para cadastrar um estabelecimento no banco de dados
     def cadastrar_estabelecimento(self, conexao):
         cursor = None
+# Obtendo o cursor para executar operações no banco de dados através da conexão fornecida
         try:
             cursor = conexao.get_cursor()
+# Executando uma operação SQL para inserir os dados do estabelecimento na tabela 'estabelecimento'
             cursor.execute(
               "INSERT INTO estabelecimento (cnpj, razaoSocial, email, telefone, segmento, endereco, horarioAbertura, horarioFechamento, senha) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);",
           (self.cnpj, self.razaoSocial, self.email, self.telefone, self.segmento, self.endereco, self.horarioAbertura, self.horarioFechamento, self.senha)
             )
+# Realizando commit para confirmar as mudanças no banco de dados
             conexao.get_conexao().commit()
-            print('Cadastro do estabelecimento concluído!')
+# Mensagem de confirmação do cadastro bem-sucedido
+            print('\nCadastro do estabelecimento concluído!')
         except Exception as e:
+# Em caso de erro, imprime o erro ocorrido durante o cadastro
             print(f"Erro durante o cadastro do estabelecimento: {e}")
 
-# Função para validar e realizar o login ===============================================
+##
   
+# Método para realizar login do estabelecimento
     def fazer_login(self, conexao, email, senha):
+# Loop contínuo para solicitar credenciais até que o login seja bem-sucedido
       while True:
           cursor = conexao.get_cursor()
           try:
+# Consulta ao banco de dados para verificar se o email e senha correspondem a algum registro
               cursor.execute("SELECT razaoSocial FROM estabelecimento WHERE email = %s AND senha = %s", (email, senha))
               resultado = cursor.fetchone()
               if resultado:
-                  self.nome_estabelecimento_autenticado = resultado[0]  # Armazena o nome do estabelecimento autenticado
+# Se as credenciais forem válidas, armazena o nome do estabelecimento autenticado
+                  self.nome_estabelecimento_autenticado = resultado[0]
                   print('\nLogin bem-sucedido!')
+# Retorna True para indicar sucesso no login
                   return True
               else:
+# Se as credenciais forem inválidas, solicita novamente email e senha
                   print('Credenciais inválidas. Tente novamente.')
                   email = input('\nDigite seu e-mail: ')
                   senha = input('Digite sua senha: ')
           except Exception as e:
+# Em caso de erro durante a consulta, imprime o erro e retorna False indicando falha no login
               print(f"\nErro durante o login: {e}")
               return False
-
-# Função de verificação para o menu de login (identificar se é estabelecimento) ========
+##
   
+# Método para verificar o tipo de estabelecimento
     def verificar_tipo_estabelecimento(self):
+# Retorna a string 'restaurante'
       return 'restaurante'
 
-# Função para buscar estabelecimentos disponíveis ======================================
+##
+  
+# Método estático para validar o CNPJ de um estabelecimento
+    @staticmethod
+# Verifica se o CNPJ possui 14 dígitos e se todos os caracteres são números
+    def validar_estab_cnpj(cnpj):
+      if len(cnpj) != 14 or not cnpj.isdigit():
+# Retorna False se o CNPJ não tiver 14 dígitos ou tiver letras
+          return False
+# Retorna True se o CNPJ tiver 14 dígitos e forem todos números
+      return True
 
+##
+  
+# Método estático para validar o formato de um endereço
+    @staticmethod
+    def endereco_estab_validado(endereco):
+# Padrão para validar o formato do endereço: "Rua X, n° x - Bairro Y"
+        padrao_endereco = r'^Rua [a-zA-Z0-9\s]+,\sn°\s[a-zA-Z0-9\s]+-\sBairro [a-zA-Z0-9\s]+$'
+# Verifica se o endereço excede 80 caracteres ou não corresponde ao padrão definido
+        if len(endereco) > 80 or not re.match(padrao_endereco, endereco):
+            print('\nEndereço inválido! O formato deve ser: Rua X, n° x - Bairro Y')
+# Retorna None se o endereço for inválido
+            return None    
+# Se o endereço corresponder ao padrão, retorna o endereço válido
+        return endereco
+
+##
+
+# Método estático para validar um endereço de e-mail
+    @staticmethod
+    def validar_estab_email(email):
+# Lista de domínios de e-mail válidos
+        dominios_validos = ['gmail.com', 'outlook.com', 'uol.com.br', 'yahoo.com', 'hotmail.com']
+        while True:
+# Verifica se o email tem no máximo 50 caracteres, contém '@' e tem um formato de domínio válido
+            if len(email) <= 50 and '@' in email and '.' in email.split('@')[-1]:
+                dominio = email.split('@')[-1]
+                if dominio in dominios_validos:
+# Retorna o email se for válido
+                    return email
+# Se o email não for válido, solicita um novo email e continua o loop
+            print('\nE-mail inválido! Por favor, digite um e-mail válido.')
+            email = input('\nDigite seu e-mail: ')
+
+##
+  
+# Método estático para validar um número de telefone
+    @staticmethod
+    def validar_estab_telefone(telefone):
+        while True:
+# Verifica se o telefone contém apenas números e está entre 11 e 15 caracteres
+            if telefone.isdigit() and 11 <= len(telefone) <= 15:
+# Retorna o telefone se for válido
+                return telefone
+# Se o telefone não for válido, solicita um novo telefone e continua o loop
+            else:
+                print('\nTelefone inválido! Por favor, digite apenas números.')
+                telefone = input('\nDigite seu telefone: ')
+              
+##
+  
+# Método estático para validar o segmento do estabelecimento
+    @staticmethod
+    def validar_estab_segmento(segmento):
+# Verifica se é uma string composta apenas por letras e com no máximo 20 caracteres
+        if isinstance(segmento, str) and segmento.isalpha() and len(segmento) <= 20:
+# Retorna o segmento se for válido
+            return segmento
+# Retorna None se o segmento não for válido
+        else:
+            return None
+
+##
+  
+# Método estático para validar o horário de abertura do estabelecimento
+    @staticmethod
+    def validar_horario_abertura(horario):
+# Expressão regular para validar o formato do horário no padrão HH:MM
+      pattern = re.compile(r'^([01]?[0-9]|2[0-3]):[0-5][0-9]$')
+# Verifica se o horário é uma string que corresponde ao padrão de formato HH:MM
+      if isinstance(horario, str) and pattern.match(horario):
+# Retorna o horário se for válido
+          return horario
+# Retorna None se o horário não for válido
+      else:
+          return None
+
+##
+
+# Método estático para validar o horário de fechamento do estabelecimento
+    @staticmethod
+    def validar_horario_fechamento(horario):
+# Expressão regular para validar o formato do horário no padrão HH:MM
+      pattern = re.compile(r'^([01]?[0-9]|2[0-3]):[0-5][0-9]$')
+# Verifica se o horário é uma string que corresponde ao padrão de formato HH:MM
+      if isinstance(horario, str) and pattern.match(horario):
+# Retorna o horário se for válido
+          return horario
+# Retorna None se o horário não for válido
+      else:
+          return None
+
+##
+
+# Método estático para validar uma senha
+    @staticmethod
+    def validar_senha(senha):
+# Verifica se a senha é uma string e possui entre 8 e 20 caracteres
+      if isinstance(senha, str) and 8 <= len(senha) <= 20:
+# Retorna a senha se for válida
+          return senha
+# Retorna None se a senha não for válida
+      else:
+          return None
+
+##
+
+# Método estático para validar a razão social do estabelecimento
+    @staticmethod
+    def validar_estab_rsocial(razaoSocial):
+# Verifica se não está vazia e se está no formato de caracteres e espaços, até 50 caracteres
+        if razaoSocial.strip() and re.match("^[A-Za-zÀ-ÖØ-öø-ÿ ]{1,50}$", razaoSocial):
+# Retorna True se a razão social for válida
+            return True
+# Retorna False se a razão social não for válida
+        return False
